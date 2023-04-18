@@ -1,0 +1,99 @@
+Screen {
+     height: auto;
+     width: auto;
+     layout: horizontal;
+     background: $boost;
+}
+
+/*Static {
+    layout: horizontal;
+}
+
+Container {
+    layout: horizontal;
+}*/
+
+Head, CurrentStage {
+    layout: horizontal;
+    height: 3;
+    border: round white;
+    color: white;
+}
+
+CurrentStage {
+    border: round #5a912c;
+    color: #5a912c;
+}
+
+StagesTable, LastInput {
+    border: round #368DFF;
+    height: 100%;
+    width: 1fr;
+}
+
+StagesTable {
+    border: round #5a912c;
+}
+
+OverallProgress {
+    border: round #5a912c;
+    height: 6;
+}
+
+.box {
+    height: 100%;
+    width: 1fr;
+}
+
+#middle_container {
+    layout: horizontal;
+}
+
+#label_company_name {
+    content-align: right middle;
+}
+
+#label_date {
+    content-align: right middle;
+    margin-right: 5;
+}
+
+label_current_stage {
+    content-align: right middle;
+}
+
+#label_progress_header, #label_last_input {
+    content-align: center middle;
+    background: grey;
+}
+
+#last_input {
+    content-align: center middle;
+    height: 100%;
+}
+
+#label_overall_progress {
+    width: 100%;
+    content-align: center middle;
+}
+
+#progress_string {
+    min-height: 3;
+    height: auto;
+    width: 100%;
+    align: center middle;
+}
+
+
+.table_stage {
+    color: #368DFF;
+}
+
+.table_timer {
+    color: #EDC628;
+}
+
+.table_percent {
+    color: #9A85ED
+}
+

@@ -1,0 +1,16 @@
+
+rpython:S1186¨"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ÿ†ŽÓ
+qpython:S1186«"YAdd a nested comment explaining why this method is empty, or complete the implementation.(™Î˜?
+6python:S3626Ô"Remove this redundant return.(ÙãÞŸ
+python:S1845©"aRename field "title" to prevent any misunderstanding/clash with field "TITLE" defined on line 283(ÙŽÄ¤ÿÿÿÿÿ
+‡python:S1845ª"iRename field "sub_title" to prevent any misunderstanding/clash with field "SUB_TITLE" defined on line 289(°õŠùÿÿÿÿÿ
+€python:S1845™"gRename field "css_path" to prevent any misunderstanding/clash with field "CSS_PATH" defined on line 281(£²ÚÖ
+rpython:S3776³"TRefactor this function to reduce its Cognitive Complexity from 28 to the 15 allowed.(ú„Úüùÿÿÿÿ
+Dpython:S5806Ä"+Rename this variable; it shadows a builtin.(ÖÈ»þ
+Špython:S5886ó"lRemove this yield statement or annotate function "compose" with "typing.Generator" or one of its supertypes.(ÈÕ…Êùÿÿÿÿ
+Mpython:S1135©	"4Complete the task associated to this "TODO" comment.(Ø£‡°
+lpython:S3776õ"TRefactor this function to reduce its Cognitive Complexity from 33 to the 15 allowed.(žµ•
+rpython:S1186ü"YAdd a nested comment explaining why this method is empty, or complete the implementation.(•àÈ°
+rpython:S3776×"TRefactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.(ýþ‰Çúÿÿÿÿ
+Mpython:S1135‰"4Complete the task associated to this "TODO" comment.(”Ÿ©«
+Rpython:S905›":Remove or refactor this statement; it has no side effects.(®æôè
