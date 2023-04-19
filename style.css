@@ -2,16 +2,8 @@ Screen {
      height: auto;
      width: auto;
      layout: horizontal;
-     background: $boost;
+     background: $surface;
 }
-
-/*Static {
-    layout: horizontal;
-}
-
-Container {
-    layout: horizontal;
-}*/
 
 Head, CurrentStage {
     layout: horizontal;
@@ -25,7 +17,12 @@ CurrentStage {
     color: #5a912c;
 }
 
-StagesTable, LastInput {
+LastInput {
+    height: 5;
+    border: round #5a912c;
+}
+
+InputLog, StagesTable{
     border: round #368DFF;
     height: 100%;
     width: 1fr;
@@ -38,11 +35,6 @@ StagesTable {
 OverallProgress {
     border: round #5a912c;
     height: 6;
-}
-
-.box {
-    height: 100%;
-    width: 1fr;
 }
 
 #middle_container {
@@ -58,23 +50,14 @@ OverallProgress {
     margin-right: 5;
 }
 
-label_current_stage {
-    content-align: right middle;
+#label_current_stage {
+    margin-left: 1;
 }
 
-#label_progress_header, #label_last_input {
+#label_progress_header, #label_input_log, #label_last_input {
     content-align: center middle;
     background: grey;
-}
-
-#last_input {
-    content-align: center middle;
-    height: 100%;
-}
-
-#label_overall_progress {
     width: 100%;
-    content-align: center middle;
 }
 
 #progress_string {
@@ -84,8 +67,19 @@ label_current_stage {
     align: center middle;
 }
 
+#last_input {
+    width: 100%;
+    content-align: center middle;
+    margin-top: 1;
+}
+
+.box {
+    height: 100%;
+    width: 1fr;
+}
 
 .table_stage {
+    margin-left: 1;
     color: #368DFF;
 }
 
@@ -97,3 +91,8 @@ label_current_stage {
     color: #9A85ED
 }
 
+.inputs {
+    content-align: center middle;
+    width: 100%;
+    color: #368DFF;
+}
