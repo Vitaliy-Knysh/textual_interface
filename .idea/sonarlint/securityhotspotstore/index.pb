@@ -7,5 +7,3 @@ k
 ;venv/lib/python3.10/site-packages/textual/widgets/_label.py,4/3/43d13755a6688f0ad42aa870d814f76b53ac2a1c
 p
 @venv/lib/python3.10/site-packages/textual/widgets/_data_table.py,6/1/619dd53fa582f1d5387151708cc8bd534b8403dd
-m
-=venv/lib/python3.10/site-packages/textual/widgets/_welcome.py,5/5/5583f08e94599b9085cd0a5c762e82b4e74e3549

@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult, RenderableType
-from textual.widgets import Welcome, Static, Label, Button, Header, Footer, DataTable, LoadingIndicator
+from textual.widgets import Static, Label, Input, Button
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.scroll_view import ScrollView
 from textual.widget import Widget
@@ -99,6 +99,19 @@ class InputLog(Static):
         with VerticalScroll():
             for input in input_log:
                 yield Label(input, classes='inputs')
+    def action_submit(self):
+        print('sos')
+
+
+class CommandInput(Static):
+    def compose(self) -> ComposeResult:
+        yield Input(placeholder='Введите команду')
+        yield Button('Ввод', variant='success', id='submit')
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Event handler called when a button is pressed."""
+        if event.button.id == "start":
+            print('ses')
 
 
 # class OverallProgress(Static):
@@ -117,7 +130,7 @@ class WelcomeApp(App):
     def compose(self) -> ComposeResult:
         # yield Container(Head(), CurrentStage(), DataTable(show_header=False, show_cursor=False))
         yield Container(Head(), CurrentStage(), Container(StagesTable(), InputLog(), id='middle_container'),
-                        LastInput())
+                        LastInput(), CommandInput())
         # yield Container(, LastInput())
 
     # def on_mount(self) -> None:
