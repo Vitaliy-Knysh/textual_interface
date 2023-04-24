@@ -18,7 +18,7 @@ ROWS = [
     ['gpu_stress', '0:00:00', '0%', '(0 из 1 выполнено)'],
     ['fio_stress', '0:00:00', '0%', '(0 из 1 выполнено)'],
 ]
-stage_col = ['preburn', 'burn', 'inventory', 'functional', 'nework', 'memory_stress', 'gpu_stress', 'fio_stress',
+stage_col = ['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress', 'gpu_stress', 'fio_stress',
              'total']
 timer_col = ['0:00:00', '0:00:00', '0:00:00', '0:00:01', '0:00:01', '0:00:13', '0:00:13', '0:00:13', '0:00:40']
 percentage_col = ['100%', '100%', '100%', '100%', '100%', '0%', '0%', '0%', '62%']
@@ -55,6 +55,10 @@ class Head(Static):
 #         super().__init__("")
 #         self._renderable_object = Progress(BarColumn())
 #         self._renderable_object.add_task("", total=None)
+
+
+class FocusableScroll( VerticalScroll, can_focus=True ):
+    pass
 
 
 class CurrentStage(Static):
@@ -94,13 +98,12 @@ class LastInput(Static):
 
 
 class InputLog(Static):
+
     def compose(self) -> ComposeResult:
         yield Label('Журнал команд', id='label_input_log')
-        with VerticalScroll():
-            for input in input_log:
-                yield Label(input, classes='inputs')
-    def action_submit(self):
-        print('sos')
+        with FocusableScroll():
+            for inp in input_log:
+                yield Label(inp, classes='inputs')
 
 
 class CommandInput(Static):
@@ -110,7 +113,7 @@ class CommandInput(Static):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a button is pressed."""
-        if event.button.id == "start":
+        if event.button.id == 'submit':
             print('ses')
 
 

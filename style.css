@@ -37,6 +37,11 @@ OverallProgress {
     height: 6;
 }
 
+InputLog:focus-within {
+    offset: 0 0 !important;
+    border: dashed #368DFF;
+}
+
 #middle_container {
     layout: horizontal;
 }
