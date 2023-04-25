@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult, RenderableType
-from textual.widgets import Static, Label, Input, Button
+from textual.widgets import Static, Label, Input, Button, DataTable, TextLog
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.scroll_view import ScrollView
 from textual.widget import Widget
@@ -28,7 +28,7 @@ summary_col = ['(1 из 1 выполнено)', '(2 из 2 выполнено)',
 time_elapsed = '0:00:13'
 overall_percent = '62%'
 overall_summary = '5 из 8 выполнено'
-input_log = ['input 1', 'input 2', 'input 3', 'input 4', 'input 5', 'input 6', 'input 7', 'input 8', 'input 9',
+INPUT_LOG = ['input 1', 'input 2', 'input 3', 'input 4', 'input 5', 'input 6', 'input 7', 'input 8', 'input 9',
              'input 10', 'input 11', 'input 12', 'input 13', 'input 14', 'input 15', 'input 16']
 
 class Head(Static):
@@ -71,23 +71,29 @@ class CurrentStage(Static):
 class StagesTable(Static):
     def compose(self) -> ComposeResult:
         yield Static('Прогресс потапно', id='label_progress_header')
-        with Horizontal():
-            with Vertical():
-                for stage in stage_col:
-                    yield Label(stage, classes='table_stage')
-            with Vertical():
-                for stage in timer_col:
-                    yield Label(stage, classes='table_timer')
-            # with Vertical():
-            #     for stage in percentage_col:
-            #         yield IndeterminateProgressBar()
-            with Vertical():
-                for stage in percentage_col:
-                    yield Label(stage, classes='table_percent')
-            with Vertical():
-                for stage in summary_col:
-                    yield Label(stage, classes='table_summary')
+        # with Horizontal():
+        #     with Vertical():
+        #         for stage in stage_col:
+        #             yield Label(stage, classes='table_stage')
+        #     with Vertical():
+        #         for stage in timer_col:
+        #             yield Label(stage, classes='table_timer')
+        #     # with Vertical():
+        #     #     for stage in percentage_col:
+        #     #         yield IndeterminateProgressBar()
+        #     with Vertical():
+        #         for stage in percentage_col:
+        #             yield Label(stage, classes='table_percent')
+        #     with Vertical():
+        #         for stage in summary_col:
+        #             yield Label(stage, classes='table_summary')
+        yield DataTable(show_header=False, show_row_labels=False, show_cursor=False)
 
+    def on_mount(self) -> None:
+        table = self.query_one(DataTable)
+        table.add_columns(*ROWS[0])
+        for number, row in enumerate(ROWS[1:], start=1):
+            table.add_row(*row, label=number)
 
 
 class LastInput(Static):
@@ -95,26 +101,21 @@ class LastInput(Static):
         last_input = 'last input placeholder'
         yield Static('Последний ввод', id='label_last_input')
         yield Static(last_input, id='last_input')
+        self.update(last_input)
 
 
 class InputLog(Static):
-
     def compose(self) -> ComposeResult:
         yield Label('Журнал команд', id='label_input_log')
-        with FocusableScroll():
-            for inp in input_log:
-                yield Label(inp, classes='inputs')
+        # with FocusableScroll():
+        #     for inp in input_log:
+        #         yield Label(inp, classes='inputs')
+        yield TextLog()
 
-
-class CommandInput(Static):
-    def compose(self) -> ComposeResult:
-        yield Input(placeholder='Введите команду')
-        yield Button('Ввод', variant='success', id='submit')
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Event handler called when a button is pressed."""
-        if event.button.id == 'submit':
-            print('ses')
+    def on_mount(self) -> None:
+        text_log = self.query_one(TextLog)
+        for inp in INPUT_LOG:
+            text_log.write(inp)
 
 
 # class OverallProgress(Static):
@@ -133,7 +134,7 @@ class WelcomeApp(App):
     def compose(self) -> ComposeResult:
         # yield Container(Head(), CurrentStage(), DataTable(show_header=False, show_cursor=False))
         yield Container(Head(), CurrentStage(), Container(StagesTable(), InputLog(), id='middle_container'),
-                        LastInput(), CommandInput())
+                        LastInput(), Input(placeholder='Введите команду'))
         # yield Container(, LastInput())
 
     # def on_mount(self) -> None:
@@ -142,7 +143,14 @@ class WelcomeApp(App):
     #     table.add_columns(*next(rows))
     #     table.add_rows(rows)
 
+    def on_input_submitted(self):
+        text_log = self.query_one(TextLog)
+        input_field = self.query_one(Input)
+        text_log.write(input_field.value)
+        label = self.query_one('#last_input')
+        label.update(input_field.value)
+        input_field.action_delete_left_all()
+
 
 if __name__ == "__main__":
-    app = WelcomeApp()
-    app.run()
+    WelcomeApp().run()

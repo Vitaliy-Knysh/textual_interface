@@ -38,7 +38,6 @@ OverallProgress {
 }
 
 InputLog:focus-within {
-    offset: 0 0 !important;
     border: dashed #368DFF;
 }
 
@@ -100,4 +99,4 @@ InputLog:focus-within {
     content-align: center middle;
     width: 100%;
     color: #368DFF;
-}
+    }
