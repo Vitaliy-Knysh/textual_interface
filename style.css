@@ -22,24 +22,29 @@ LastInput {
     border: round #5a912c;
 }
 
-InputLog, StagesTable{
+InputLog, StagesTable {
     border: round #368DFF;
     height: 100%;
     width: 1fr;
 }
 
 StagesTable {
-    border: round #5a912c;
+     border: round #5a912c;
 }
 
-OverallProgress {
-    border: round #5a912c;
-    height: 6;
+TextLog {
+    padding-bottom: 1;
+}
+
+
+StagesTable:focus-within {
+    border: dashed #5a912c;
 }
 
 InputLog:focus-within {
     border: dashed #368DFF;
 }
+
 
 #middle_container {
     layout: horizontal;
@@ -77,6 +82,7 @@ InputLog:focus-within {
     margin-top: 1;
 }
 
+
 .box {
     height: 100%;
     width: 1fr;
@@ -99,4 +105,4 @@ InputLog:focus-within {
     content-align: center middle;
     width: 100%;
     color: #368DFF;
-    }
+}
