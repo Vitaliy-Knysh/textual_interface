@@ -194,4 +194,3 @@ if __name__ == "__main__":
     # app.stages_table = ROWS
     # app.run()
     # asyncio.run(main())
-
