@@ -1,38 +1,30 @@
 import threading
 
+import interface
 from interface import InterfaceApp
 import random
 import time
+import asyncio
 from threading import Thread
 
-
-ROWS = [
-    ('preburn', '0:00:00', '100%', '(1 из 1 выполнено)'),
-    ('burn', '0:00:00', '100%', '(2 из 2 выполнено)'),
-    ('inventory', '0:00:00', '100%', '(2 из 2 выполнено)'),
-    ('functional', '0:00:01', '100%', '(3 из 3 выполнено)'),
-    ('nework', '0:00:01', '100%', '(1 из 1 выполнено)'),
-    ('memory_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('gpu_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('fio_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-]
-
-
-ROWS2 = [
-    ('preburn', '0:00:00', '0%', '(1 из 1 выполнено)'),
-    ('burn', '0:00:00', '0%', '(2 из 2 выполнено)'),
-    ('inventory', '0:00:00', '0%', '(2 из 2 выполнено)'),
-    ('functional', '0:00:01', '0%', '(3 из 3 выполнено)'),
-    ('nework', '0:00:01', '0%', '(1 из 1 выполнено)'),
-    ('memory_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('gpu_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('fio_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-]
-
+def randomize_table():
+    global ROWS
+    while True:
+        tbl = []
+        for _ in range(8):
+            all_stages = random.randint(1, 8)
+            completed = random.randint(0, all_stages)
+            percent = int(completed / all_stages * 100)
+            s = (random.choice(
+                ['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress', 'gpu_stress', 'fio_stress']),
+                 f'{random.randint(0, 9)}:{random.randint(0, 59)}:{random.randint(0, 59)}',
+                 f'{percent}%',
+                 f'{completed} из {all_stages} выполнено',)
+            tbl.append(s)
+        await asyncio.sleep(1)
+        ROWS = tbl
 
 if __name__ == "__main__":
-    app = InterfaceApp()
-    app.stages_table = ROWS
-    thread1 = Thread(target=app.run())
-    thread1.start()
-
+    loop = asyncio.get_event_loop()
+    randomize_table()
+    loop.run_until_complete(interface.main())

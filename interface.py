@@ -1,53 +1,44 @@
+import asyncio
+import textual.widgets
 from textual.app import App, ComposeResult, RenderableType
-from textual.widgets import Static, Label, Input, Button, DataTable, TextLog
+from textual.widgets import Static, Label, Input, Button, DataTable, TextLog, ProgressBar
 from textual.containers import Container, Horizontal, Vertical, VerticalScroll
 from textual.scroll_view import ScrollView
+from textual import work
 from textual.widget import Widget
 from textual.geometry import Size
 from textual.reactive import reactive
-from rich.progress import Progress, BarColumn
+from textual import events
 from datetime import datetime
 import random
 import time
+from rich.text import Text
+
 
 
 ROWS = [
-    ('preburn', '0:00:00', '100%', '(1 из 1 выполнено)'),
-    ('burn', '0:00:00', '100%', '(2 из 2 выполнено)'),
-    ('inventory', '0:00:00', '100%', '(2 из 2 выполнено)'),
-    ('functional', '0:00:01', '100%', '(3 из 3 выполнено)'),
-    ('nework', '0:00:01', '100%', '(1 из 1 выполнено)'),
-    ('memory_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('gpu_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('fio_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
+    ('preburn', '0:00:00', '(1 выполнено)'),
+    ('burn', '0:00:00', '(2 выполнено)'),
+    ('inventory', '0:00:00', '(2 выполнено)'),
+    ('functional', '0:00:01', '(3 выполнено)'),
+    ('nework', '0:00:01', '(1 выполнено)'),
+    ('memory_stress', '0:00:00', '(0 выполнено)'),
+    ('gpu_stress', '0:00:00', '(0 выполнено)'),
+    ('fio_stress', '0:00:00', '(0 выполнено)'),
 ]
 
-ROWS2 = [
-    ('preburn', '0:00:00', '0%', '(1 из 1 выполнено)'),
-    ('burn', '0:00:00', '0%', '(2 из 2 выполнено)'),
-    ('inventory', '0:00:00', '0%', '(2 из 2 выполнено)'),
-    ('functional', '0:00:01', '0%', '(3 из 3 выполнено)'),
-    ('nework', '0:00:01', '0%', '(1 из 1 выполнено)'),
-    ('memory_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('gpu_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-    ('fio_stress', '0:00:00', '0%', '(0 из 1 выполнено)'),
-]
+current_stage = 'preburn'
 
-stage_col = ['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress', 'gpu_stress', 'fio_stress',
-             'total']
-timer_col = ['0:00:00', '0:00:00', '0:00:00', '0:00:01', '0:00:01', '0:00:13', '0:00:13', '0:00:13', '0:00:40']
-percentage_col = ['100%', '100%', '100%', '100%', '100%', '0%', '0%', '0%', '62%']
-summary_col = ['(1 из 1 выполнено)', '(2 из 2 выполнено)', '(2 из 2 выполнено)', '(3 из 3 выполнено)',
-               '(1 из 1 выполнено)', '(0 из 1 выполнено)', '(0 из 1 выполнено)', '(0 из 1 выполнено)',
-               '(5 из 8 выполнено)']
-time_elapsed = '0:00:13'
-overall_percent = '62%'
-overall_summary = '5 из 8 выполнено'
+
 INPUT_LOG = ['input 1', 'input 2', 'input 3', 'input 4', 'input 5', 'input 6', 'input 7', 'input 8', 'input 9',
              'input 10', 'input 11', 'input 12', 'input 13', 'input 14', 'input 15', 'input 16']
 
 
 class FocusableScroll( VerticalScroll, can_focus=True ):
+    pass
+
+
+class Title(Static):
     pass
 
 
@@ -67,6 +58,7 @@ class CurrentStage(Static):
 
 
 class StagesTable(Static):
+
     def __init__(self, rows):
         super().__init__()
         self.rows = rows
@@ -75,12 +67,27 @@ class StagesTable(Static):
         yield Static('Прогресс потапно', id='label_progress_header')
         with FocusableScroll():
             yield DataTable(show_header=False, show_row_labels=False, show_cursor=False, id='table_stages')
+        # for line in ROWS:
+        #     yield ProgressBar(id=line[0])
 
     def on_mount(self) -> None:
         table = self.query_one(DataTable)
         table.add_columns(*self.rows[0])
         for number, row in enumerate(self.rows, start=1):
             table.add_row(*row, label=number)
+
+class StageLine(Static):
+    def __init__(self, row):
+        super().__init__()
+        self.row = row
+    def compose(self) -> ComposeResult:
+        with Horizontal():
+            yield Label(self.row[0])
+            yield ProgressBar(total=100, id=f'progress-{self.row[0]}')
+            yield Label(self.row[3])
+
+    def _on_mount(self) -> None:
+        self.query_one(f'#progress-{self.row[0]}').update(progress=int(self.row[2][:-1]))
 
 
 class LastInput(Static):
@@ -101,6 +108,12 @@ class InputLog(Static):
             text_log.write(inp)
 
 
+class Sidebar(Container):
+    def compose(self) -> ComposeResult:
+        yield Label('Код ошибки')
+        yield Label('Руководство, что делать при этой ошибке')
+
+
 class InterfaceApp(App):
     CSS_PATH = 'style.css'
     def __int__(self, stages_table, input_log):
@@ -109,52 +122,76 @@ class InterfaceApp(App):
         self.input_log = input_log
 
     def compose(self) -> ComposeResult:
-        yield Container(Head(), CurrentStage(), Container(StagesTable(ROWS), InputLog(), id='middle_container'),
-                        LastInput(), Input(placeholder='Введите команду'), Button('Таблица', id='btn_randomize_table'),
-                        Button('Этап', id='btn_stage'))
+        yield Container(Head(), Container(StagesTable(ROWS), InputLog(), id='middle_container'),
+                        VerticalScroll(id='stages_table_2'), Sidebar())
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == 'btn_randomize_table':
-            # table = self.query_one(DataTable)
-            # for row in range(len(ROWS)):
-            #     table.update_cell_at([row, 2], f'{random.randint(0, 100)}%')
-            tbl = []
-            for _ in range(8):
-                all_stages = random.randint(1, 8)
-                completed = random.randint(0, all_stages)
-                percent = int(completed / all_stages * 100)
-                s = (random.choice(['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress', 'gpu_stress', 'fio_stress']),
-                                    f'{random.randint(0, 9)}:{random.randint(0, 59)}:{random.randint(0, 59)}',
-                                    f'{percent}%',
-                                    f'{completed} из {all_stages} выполнено',)
-                tbl.append(s)
-            self.update_table(tbl)
-        if event.button.id == 'btn_stage':
-            label = self.query_one('#label_current_stage_name')
-            new_text = random.choice(['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress',
-                                     'gpu_stress', 'fio_stress'])
-            label.update(new_text)
+    # def add_line(self, content):
+    #     new_line = StageLine(content)
+    #     self.query_one('#stages_table_2').mount(new_line)
+    #
+    # def remove_line(self):
+    #     lines = self.query('#stages_table_2')
+    #     if lines:
+    #         lines.last().remove()
 
-
-    def on_input_submitted(self):
-        text_log = self.query_one(TextLog)
-        label = self.query_one('#last_input')
-        table = self.query_one(DataTable)
-        input_field = self.query_one(Input)
-        text_log.write(input_field.value)
-        label.update(input_field.value)
-        input_field.action_delete_left_all()
-        table.add_row('fio_stress', '0:00:00', '0%', '(0 из 1 выполнено)')
 
     def update_table(self, new_table):
         table = self.query_one(DataTable)
-        for row in new_table:
-            for cell, content in enumerate(row):
-                table.update_cell_at([new_table.index(row), cell], content)
+        table.clear()
+        for number, row in enumerate(new_table, start=1):
+            if row[0] == current_stage:
+                row = [
+                    Text(cell, style="bold #03AC13") for cell in row
+                ]
+            table.add_row(*row)
+
+    def on_key(self, event: events.Key) -> None:
+        if event.key == 'f':
+            sidebar = self.query_one(Sidebar)
+            self.set_focus(None)
+            if sidebar.has_class("-hidden"):
+                sidebar.remove_class("-hidden")
+            else:
+                sidebar.add_class("-hidden")
+
+async def main():
+    app = InterfaceApp()
+    async def external_input():
+        while True:
+            rows_prev = ROWS
+            await asyncio.sleep(0.2)
+            if ROWS != rows_prev:
+                app.update_table(ROWS)
+
+    async def randomize_table():
+        global ROWS
+        global current_stage
+        while True:
+            tbl = []
+            for _ in range(random.randint(1, 8)):
+                all_stages = random.randint(1, 8)
+                completed = random.randint(0, all_stages)
+                percent = int(completed / all_stages * 100)
+                s = (random.choice(
+                    ['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress', 'gpu_stress', 'fio_stress']),
+                     f'{random.randint(0, 9)}:{random.randint(0, 59)}:{random.randint(0, 59)}',
+                     f'{completed} выполнено',)
+                tbl.append(s)
+            await asyncio.sleep(1)
+            ROWS = tbl
+            current_stage = random.choice(
+                    ['preburn', 'burn', 'inventory', 'functional', 'network', 'memory_stress', 'gpu_stress', 'fio_stress'])
 
 
+    runs = [app.run_async(), external_input(), randomize_table()]
+    # runs = [app.run_async(), external_input()]
+    await asyncio.gather(*runs)
 
 if __name__ == "__main__":
-    app = InterfaceApp()
-    app.stages_table = ROWS
-    app.run()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    # app = InterfaceApp()
+    # app.stages_table = ROWS
+    # app.run()
+    # asyncio.run(main())
+
